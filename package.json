@@ -2,7 +2,7 @@
   "name": "qnet",
   "version": "0.1.0",
   "description": "qnet",
-  "main": "qnode.js",
+  "main": "index.js",
   "author": {
     "name": "Loye",
     "email": "loye.qiu@gmail.com"
