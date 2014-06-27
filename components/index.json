@@ -1,0 +1,14 @@
+{
+  "endpoint": {
+    "startup": 1,
+    "path": "/qnode",
+    "port": 1337
+  },
+  "proxy": {
+    "startup": 1,
+    "path": "/proxy"
+  },
+  "tunnel": {
+    "startup": -1
+  }
+}

@@ -1,4 +1,13 @@
-var QNode = require('./lib/qnode.js');
+var Node = require('./lib/qnode.js');
 
-var n = new QNode({ port: 1337 });
+var opts = {
+    port: 1337,
+    //host: '0.0.0.0',
+    url: 'ws://localhost:1337/qnode'
 
+};
+
+var n = new Node(opts).start();
+//setTimeout(function () { n.stop().start(); }, 3000);
+console.log(n.profile);
+console.log(n.context);
