@@ -3,7 +3,7 @@ var Node = require('./lib/qnode.js');
 var opts = {
     port: 1337,
     //host: '0.0.0.0',
-    url: 'ws://localhost:1337/qnode'
+    url: 'ws://localhost:1337/node'
 
 };
 

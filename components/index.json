@@ -4,6 +4,6 @@
     "path": "/proxy"
   },
   "tunnel": {
-    "startup": -1
+    "startup": 0
   }
 }
