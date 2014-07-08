@@ -68,7 +68,7 @@ function connect(src, endpoint) {
 
 module.exports.Tunnel = Tunnel;
 
-module.exports.qnodeComponent = {
+module.exports.component = {
     start: function (qnode, config) {
         //this._server = qnode.listen(config.path, function (conn) {
 

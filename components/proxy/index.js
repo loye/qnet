@@ -2,13 +2,13 @@ var proxy = require('./proxy_tunnel');
 
 module.exports.ProxyTunnel = proxy.ProxyTunnel;
 
-module.exports.qnodeComponent = {
-    start: function (qnode, config) {
-        this._server = qnode.listen(config.path, function (conn) {
+module.exports.component = {
+    start: function (node, config) {
+        this._server = node.listen(config.path, function (conn) {
             conn.pipe(new proxy.ProxyTunnel(config.proxy)).pipe(conn);
         });
     },
-    stop: function (qnode, config) {
+    stop: function (node, config) {
         if (this._server) {
             this._server.close();
             delete this._server;
