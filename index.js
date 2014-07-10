@@ -3,7 +3,10 @@ var Node = require('./lib/qnode.js');
 var opts = {
     name: 'demo',
     port: 1337,
-    url: 'ws://localhost:1337/node',
+    endpoint: {
+        type: 'websocket',
+        url: 'ws://localhost:1337/node'
+    },
     nodes: ['ws://localhost:4000/node']
 
 };
