@@ -1,14 +1,15 @@
 var Node = require('./lib/qnode.js');
 
 var opts = {
-    name: 'demo',
+    name: 'chn-lqiu1',
+    domain: 'mstr',
     port: 1337,
     endpoint: {
-        type: 'websocket',
-        url: 'ws://localhost:1337/node'
+        domain: 'mstr',
+        url: 'ws://chn-lqiu1:1337/node'
     },
-    nodes: ['ws://localhost:4000/node']
-
+    nodes: ['ws://localhost:4000/node', 'ws://chn-lqiu:1337/node'],
+    reconnect: { interval: 10 }
 };
 
 

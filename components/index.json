@@ -1,4 +1,7 @@
 {
+  "console": {
+    "startup": 1
+  },
   "proxy": {
     "startup": 1,
     "path": "/proxy"
