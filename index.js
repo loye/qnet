@@ -5,10 +5,10 @@ var opts = {
     domain: 'mstr',
     port: 1337,
     endpoint: {
-        domain: 'mstr',
+        domain: 'a',
         url: 'ws://chn-lqiu1:1337/node'
     },
-    nodes: ['ws://localhost:4000/node', 'ws://chn-lqiu:1337/node'],
+    //nodes: ['ws://localhost:4000/node', 'ws://chn-lqiu:1337/node'],
     reconnect: { interval: 10 }
 };
 
