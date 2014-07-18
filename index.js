@@ -16,10 +16,9 @@ var opts = {
 
 
 var n = new Node(opts).start();
-//setTimeout(function () { n.stop().start(); }, 3000);
-console.log(n.profile);
+//console.log(n.profile);
 //console.log(n.context);
 
-//process.on('uncaughtException', function (err) {
-//    console.log('[Error catched by process]' + err);
-//});
+process.on('uncaughtException', function (err) {
+    console.log('[Error catched by process]' + err);
+});
