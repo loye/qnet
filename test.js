@@ -6,6 +6,7 @@ var opts = {
     endpoint: {
         type: 'websocket',
         url: 'ws://localhost:4000/node'
+        //url: 'wss://qnet-ea.azurewebsites.net/node'
     }
 
 };

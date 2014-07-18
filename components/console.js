@@ -37,8 +37,8 @@ var Console = (function () {
     function sendCommand(command, data, callback) {
         var commandar = this.node.net.commandar;
         if (commandar) {
-            callback.call(null, 'command accepted...');
-            commandar.execute(this, command, data);
+            console.log('command sent');
+            commandar.execute(this, command, data, callback);
         }
     };
 
@@ -62,8 +62,8 @@ var Console = (function () {
                 var pkg = parse(str);
                 if (pkg) {
                     console.log(pkg);
-                    sendCommand.call(this, pkg.command, pkg.data, function (result) {
-                        console.log(result);
+                    sendCommand.call(this, pkg.command, pkg.data, function (err, res) {
+                        console.log(err ? err : res);
                     });
                 } else {
                     console.log('command not well formatted');
@@ -72,7 +72,6 @@ var Console = (function () {
         };
 
         proto.command = function (command, data, callback) {
-            console.log('command execute result:');
             console.log(command);
             console.log(data);
             typeof callback === 'function' && callback.call(null);
