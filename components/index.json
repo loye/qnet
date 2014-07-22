@@ -1,4 +1,7 @@
 {
+  "webAdmin": {
+    "startup": 1
+  },
   "console": {
     "startup": 1
   },

@@ -1,3 +1,4 @@
+var util = require('util');
 
 var Console = (function () {
     function _(node, config) {
@@ -63,7 +64,7 @@ var Console = (function () {
                 if (pkg) {
                     console.log(pkg);
                     sendCommand.call(this, pkg.command, pkg.data, function (err, res) {
-                        console.log(err ? err : res);
+                        console.log(err ? err : util.inspect(res, { depth: 5 }));
                     });
                 } else {
                     console.log('command not well formatted');
@@ -73,7 +74,7 @@ var Console = (function () {
 
         proto.command = function (command, data, callback) {
             console.log(command);
-            console.log(data);
+            console.log(util.inspect(data, { depth: 5 }));
             typeof callback === 'function' && callback.call(null);
         };
 

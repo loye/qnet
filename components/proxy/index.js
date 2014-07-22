@@ -4,7 +4,7 @@ module.exports.ProxyTunnel = proxy.ProxyTunnel;
 
 module.exports.component = {
     start: function (node, config) {
-        this._server = node.listen(config.path, function (conn) {
+        this._server = node.listen(config.path || '/proxy', function (conn) {
             conn.pipe(new proxy.ProxyTunnel(config.proxy)).pipe(conn);
         });
     },
