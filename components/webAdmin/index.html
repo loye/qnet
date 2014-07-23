@@ -1,21 +1,248 @@
 ﻿<!DOCTYPE html>
-
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
     <title>qnode</title>
-    <!--<script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.1.min.js"></script>-->
+    <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.1.min.js"></script>
+    <style type="text/css">
+        #url {
+            width: 50%;
+            border-style: solid;
+        }
+    </style>
 </head>
 <body>
+    <div id="main">
+        <div>
+            <input type="text" id="url" /><input type="submit" id="connect" value="connect" />
+
+        </div>
+
+    </div>
     <script type="text/javascript">
-        var ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/webadmin');
-        ws.onmessage = function (event) {
-            console.log(JSON.parse(event.data));
+        function EventEmitter(target) {
+            if (typeof target === 'function') {
+                var proto = target.prototype;
+
+                proto.on = proto.addListener = function (type, listener) {
+                    if (typeof listener !== 'function') {
+                        throw new Error('listener must be function');
+                    }
+                    this._events || (this._events = {});
+                    this._events[type] || (this._events[type] = []);
+                    this._events[type].push(listener);
+                    return this;
+                };
+
+                proto.once = function (type, listener) {
+                    if (typeof listener !== 'function') {
+                        throw new Error('listener must be function');
+                    }
+                    var fired = false;
+                    function g() {
+                        this.removeListener(type, g);
+                        if (!fired) {
+                            fired = true;
+                            listener.apply(this, arguments);
+                        }
+                    }
+                    this.on(type, g);
+                    return this;
+                };
+
+                proto.removeListener = function (type, listener) {
+
+                    return this;
+                };
+
+                proto.removeAllListeners = function (type) {
+                    //var key, listeners;
+
+                    //if (!this._events)
+                    //    return this;
+
+                    //// not listening for removeListener, no need to emit
+                    //if (!this._events.removeListener) {
+                    //    if (arguments.length === 0)
+                    //        this._events = {};
+                    //    else if (this._events[type])
+                    //        delete this._events[type];
+                    return this;
+                };
+
+                proto.emit = function (type) {
+                    this._events || (this._events = {});
+                    var evts = this._events[type];
+                    if (evts && evts.length > 0) {
+                        var args = [];
+                        for (var i = 1; i < arguments.length; i++) {
+                            args[i - 1] = args[i];
+                        }
+                        for (var i = 0; i < evts.length; i++) {
+                            evts[i].apply(this, args);
+                        }
+                    }
+                    return this;
+                };
+            }
         };
-        ws.onopen = function (a) {
-            ws.send(JSON.stringify({ id: 'abc', command: 'get.profile' }));
-            ws.send(JSON.stringify({ id: 'abc', command: 'get.links' }));
-        };
+
+        var WebAdmin = (function () {
+            function _() {
+
+            };
+
+            function generateId(length) {
+                var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890', l = 62, ls = 52, id = '';
+                id = chars.charAt(Math.abs(Math.random() * Math.random() * Date.now() | 0) % ls);
+                for (var i = 1, len = length || 16; i < len; i++) {
+                    id += chars.charAt(Math.abs(Math.random() * Math.random() * Date.now() | 0) % l);
+                }
+                return id;
+            };
+
+            function handlePackage(pkg) {
+                var self = this;
+                if (typeof pkg.command === 'string') {
+                    function cb(err, res) {
+                        if (pkg.id) {
+                            self.message({ id: pkg.id, response: { error: err, response: res } });
+                        }
+                    };
+                    self.emit('command.' + pkg.command, pkg.data, cb);
+                    self.emit('command', pkg.command, pkg.data, cb);
+                } else if (pkg.response && pkg.id) {
+                    self.emit('response.' + pkg.id, pkg.response);
+                }
+            };
+
+            function authenticate(callback) {
+                var self = this;
+                callback.call(null);
+            };
+
+            (function (proto) {
+                proto.connect = function (url, callback) {
+                    var self = this;
+                    this.ws && this.ws.close();
+                    var ws = this.ws = new WebSocket(url);
+
+                    console.log('connecting to', ws.url);
+
+                    ws.onmessage = function (event) {
+                        var msg;
+                        try {
+                            msg = JSON.parse(event.data);
+                        } catch (e) { }
+                        if (msg) {
+                            handlePackage.call(self, msg);
+                        }
+                    };
+
+                    ws.onopen = function () {
+                        authenticate.call(self, callback);
+                    };
+
+                    ws.onerror = function (e) {
+                        console.log('error:', e);
+                    };
+
+                    ws.onclose = function () {
+                        ws.onmessage = ws.onerror = ws.onopen = function () { };
+                        console.log('close connection to', ws.url);
+                    };
+
+                    return this;
+                };
+
+                proto.message = function (message, callback) {
+                    if (message && this.ws && this.ws.readyState === this.ws.OPEN) {
+                        try {
+                            this.ws.send(JSON.stringify(message));
+                            return true;
+                        } catch (e) { }
+                    }
+                    return false;
+                };
+
+                proto.command = function (command, data, callback) {
+                    var self = this, id = generateId();
+                    if (typeof data === 'function') {
+                        callback = data;
+                        data = undefined;
+                    }
+                    if (typeof command === 'string' && command.length > 0) {
+                        this.message({ id: id, command: command, data: data }, typeof callback === 'function' ? function (err) {
+                            if (err) {
+                                callback.call(null, err);
+                            } else {
+                                self.once('response.' + id, function (res) {
+                                    callback.call(null, res.error, res.response);
+                                });
+                            }
+                        } : undefined);
+                    } else {
+                        callback.call(null, new Error('command is null'));
+                    }
+                    return this;
+                };
+            })(_.prototype);
+
+            return _;
+        })();
+
+        var Page = (function ($) {
+            function _(connections) {
+                // init
+                this.webAdmin = new WebAdmin();
+
+                init.call(this);
+            };
+
+            function init() {
+                var self = this;
+                if (window.location.host && !$('#url').val() === '') {
+                    var url = (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + '/webadmin';
+                    $('#url').val(url);
+                }
+                $('#connect').on('click', self.connect.bind(self));
+                $('#url').on('keypress', function (e) {
+                    if (e.which === 13) {
+                        e.preventDefault();
+                        self.connect();
+                    }
+                });
+
+                this.connect();
+            };
+
+            (function (proto) {
+                proto.connect = function () {
+                    var self = this, url = $('#url').val();
+                    if (url) {
+                        this.url = url;
+                        self.webAdmin.connect(url, function (err) {
+                            if (err) {
+                                console.log('error:', err);
+                                $('#url').css('border-color', '#FF0000');
+                            } else {
+                                console.log('connect to', url, 'success');
+                                $('#url').css('border-color', '#00FF00');
+                            }
+                        });
+                    }
+                };
+
+
+            })(_.prototype);
+
+            return _;
+        })(jQuery);
+
+        // init page
+        $('#url').val('ws://localhost:1337/webadmin');
+        var page = new Page();
+        var webAdmin = page.webAdmin;
 
     </script>
 </body>
