@@ -240,9 +240,12 @@
         })(jQuery);
 
         // init page
-        $('#url').val('ws://localhost:1337/webadmin');
         var page = new Page();
         var webAdmin = page.webAdmin;
+        if (!$('#url').val()) {
+            $('#url').val('ws://localhost:1337/webadmin');
+            page.connect();
+        }
 
     </script>
 </body>
