@@ -50,6 +50,21 @@
                     return this;
                 };
 
+                proto.emit = function (type) {
+                    this._events || (this._events = {});
+                    var evts = this._events[type];
+                    if (evts && evts.length > 0) {
+                        var args = [];
+                        for (var i = 1; i < arguments.length; i++) {
+                            args[i - 1] = args[i];
+                        }
+                        for (var i = 0; i < evts.length; i++) {
+                            evts[i].apply(this, args);
+                        }
+                    }
+                    return this;
+                };
+
                 proto.removeListener = function (type, listener) {
 
                     return this;
@@ -70,20 +85,6 @@
                     return this;
                 };
 
-                proto.emit = function (type) {
-                    this._events || (this._events = {});
-                    var evts = this._events[type];
-                    if (evts && evts.length > 0) {
-                        var args = [];
-                        for (var i = 1; i < arguments.length; i++) {
-                            args[i - 1] = args[i];
-                        }
-                        for (var i = 0; i < evts.length; i++) {
-                            evts[i].apply(this, args);
-                        }
-                    }
-                    return this;
-                };
             }
         };
 
@@ -91,6 +92,7 @@
             function _() {
 
             };
+            EventEmitter(_);
 
             function generateId(length) {
                 var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890', l = 62, ls = 52, id = '';
@@ -156,12 +158,16 @@
                 };
 
                 proto.message = function (message, callback) {
+                    var err;
                     if (message && this.ws && this.ws.readyState === this.ws.OPEN) {
                         try {
                             this.ws.send(JSON.stringify(message));
+                            callback.call(null);
                             return true;
-                        } catch (e) { }
+                        } catch (e) { err = e; }
                     }
+                    err || (err = new Error('message not sent'));
+                    callback.call(null, err);
                     return false;
                 };
 
