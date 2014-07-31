@@ -11,7 +11,7 @@ var opts = {
         url: ''
     },
     //nodes: ['wss://qnet-ea.azurewebsites.net/node', 'wss://qnet.chinacloudsites.cn/node'],
-    reconnect: {},
+    reconnect: {}
 };
 
 
